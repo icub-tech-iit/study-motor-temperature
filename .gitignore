@@ -7,7 +7,6 @@ build*
 *.mexw64
 *.mexa64
 slprj*
-*.zip
 *_ert_rtw
 cache*
 codegen*
