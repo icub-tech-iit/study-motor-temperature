@@ -19,11 +19,17 @@
 % temperatureHardwareLimit = 0;                % Example threshold (°C)
 
 addpath(genpath('.'))
+
 %%
 [experimentName, experimentPath] = uigetfile({'*.mat','Data Files (*.mat)'}, ...
                                                   'Select the real data to run the test.');
 
 experimentData = load([experimentPath experimentName]);
+
+% Request the threshold limit to the user
+temperatureHardwareLimit = askThreshold();
+
+
 %%
 timestamps = getTimestamps(experimentData);
 
@@ -36,7 +42,7 @@ temperature = getTemperatureData('torso_pitch_mj1_real_aksim2', experimentData);
 
 plotTemperatureData(timestamps, temperature, joint_index, joint_name)
 
-temperatureHardwareLimit = 31;
+
 
 diagnostic = errorHandlingTemperature(timestamps, temperature, temperatureHardwareLimit);
 
