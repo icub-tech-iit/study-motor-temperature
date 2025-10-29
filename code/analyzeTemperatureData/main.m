@@ -17,6 +17,7 @@
 % timestamps = (0:0.5:250);                   % seconds (numeric) for demo
 % temperature = 95*sin(2*pi*timestamps/250);   % °C, synthetic
 % temperatureHardwareLimit = 0;                % Example threshold (°C)
+clear, clc
 
 addpath(genpath('.'))
 
@@ -28,21 +29,25 @@ experimentData = load([experimentPath experimentName]);
 
 %% Get data
 
+descriptionList = getDescriptionList(experimentData);
 timestamps = getTimestamps(experimentData);
 
-% The joint names are listed inside the "description list" section of the
-% experiment data (experimentData -> experiment Name -> description_list).
+[joint_idx, isSelected] = listdlg('ListString', descriptionList);
 
-joint_name = 'torso_pitch_mj1_real_aksim2';
-joint_index = getJointIndex(joint_name, experimentData);
-
-temperature = getTemperatureData('torso_pitch_mj1_real_aksim2', experimentData);
-
-%% Process data
-plotTemperatureData(timestamps, temperature, joint_index, joint_name)
-
-diagnostic = errorHandlingTemperature(timestamps, temperature);
-
-printDiagnosticMarkdown(timestamps, diagnostic)
-
-plotOverheatingZones(timestamps, temperature, diagnostic.mask.OVERHEAT, diagnostic.regions.OVERHEAT);
+if isSelected
+    for i = joint_idx
+        
+        current_joint_name = descriptionList{i};
+        
+        temperature = getTemperatureData(current_joint_name, experimentData);
+        plotTemperatureData(timestamps, temperature, joint_idx(i), current_joint_name);
+        
+        diagnostic = errorHandlingTemperature(timestamps, temperature);
+        plotOverheatingZones(timestamps, temperature, diagnostic.mask.OVERHEAT, diagnostic.regions.OVERHEAT);
+    
+        printDiagnosticMarkdown(timestamps, diagnostic);
+        
+    end
+else
+    disp('No joint selected');
+end
